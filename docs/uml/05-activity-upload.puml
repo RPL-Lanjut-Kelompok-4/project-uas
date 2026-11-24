@@ -1,0 +1,31 @@
+@startuml activity-upload
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam activity {
+  BackgroundColor #E8EEFC
+  BorderColor #2F5BD3
+}
+|Mahasiswa|
+start
+:Buka menu Upload Dokumen;
+:Pilih file .txt / .md;
+:Klik "Upload & Index";
+|Sistem (Spring AI)|
+if (Ekstensi .txt / .md?) then (ya)
+  :TextReader membaca isi file
+  (Extract);
+  :TokenTextSplitter memecah teks
+  menjadi chunk (Transform);
+  :EmbeddingModel mengubah
+  tiap chunk menjadi vektor;
+  :Simpan ke SimpleVectorStore
+  (Load);
+  :Kirim jumlah chunk & total chunk;
+else (tidak)
+  :Kirim pesan error 400;
+endif
+|Mahasiswa|
+:Melihat hasil upload;
+:Bertanya di menu Tanya Dokumen;
+stop
+@enduml

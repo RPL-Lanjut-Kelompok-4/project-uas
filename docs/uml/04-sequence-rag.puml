@@ -1,0 +1,33 @@
+@startuml sequence-rag
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam sequenceParticipantBackgroundColor #E8EEFC
+skinparam sequenceParticipantBorderColor #2F5BD3
+autonumber
+actor Mahasiswa
+participant "Browser" as UI
+participant AiController
+participant RagService
+participant "ChatClient" as CC
+participant "QuestionAnswerAdvisor" as QA
+participant "VectorStore" as VS
+participant "EmbeddingModel" as EM
+participant "ChatModel" as Model
+
+Mahasiswa -> UI : "Apa syarat mengambil skripsi?"
+UI -> AiController : POST /api/rag/ask
+AiController -> RagService : ask(question)
+RagService -> CC : prompt().user(question).call()
+CC -> QA : before(request)
+QA -> VS : similaritySearch(query, topK=3)
+VS -> EM : embed(query)
+EM --> VS : vektor query
+VS --> QA : 3 Document paling mirip (cosine similarity)
+QA --> CC : user message + konteks dokumen
+CC -> Model : call(prompt)
+Model --> CC : jawaban berdasarkan konteks
+CC --> RagService : ChatClientResponse (+ RETRIEVED_DOCUMENTS)
+RagService --> AiController : AskResponse(answer, sources)
+AiController --> UI : 200 OK (JSON)
+UI --> Mahasiswa : jawaban + sumber dokumen
+@enduml

@@ -1,0 +1,37 @@
+@startuml use-case
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam usecase {
+  BackgroundColor #E8EEFC
+  BorderColor #2F5BD3
+}
+left to right direction
+actor "Mahasiswa" as M
+actor "Model AI\n(ChatModel)" as AI <<system>>
+
+rectangle "SiAkad AI - Asisten Akademik" {
+  usecase "Chat dengan Asisten" as UC1
+  usecase "Mengingat Konteks\nPercakapan" as UC1a
+  usecase "Menanyakan Tanggal/Waktu" as UC2
+  usecase "Menghitung IP" as UC3
+  usecase "Tanya Dokumen (RAG)" as UC4
+  usecase "Mencari Chunk Relevan\ndi VectorStore" as UC4a
+  usecase "Upload Dokumen" as UC5
+  usecase "Membuat Kuis" as UC6
+  usecase "Melihat Info Sistem" as UC7
+}
+
+M --> UC1
+M --> UC4
+M --> UC5
+M --> UC6
+M --> UC7
+UC1 .> UC1a : <<include>>
+UC2 .> UC1 : <<extend>>
+UC3 .> UC1 : <<extend>>
+UC4 .> UC4a : <<include>>
+UC1 --> AI
+UC4 --> AI
+UC6 --> AI
+@enduml

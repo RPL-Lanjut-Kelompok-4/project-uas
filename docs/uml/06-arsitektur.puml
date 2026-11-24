@@ -1,0 +1,53 @@
+@startuml arsitektur
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #E8EEFC
+  BorderColor #2F5BD3
+}
+
+node "Browser" {
+  [index.html + app.js] as UI
+}
+
+node "Spring Boot (Tomcat :8080)" {
+  [AiController\n(REST API)] as C
+  package "Service Layer" {
+    [ChatService] as CS
+    [RagService] as RS
+    [QuizService] as QS
+    [DocumentService] as DS
+  }
+  package "Spring AI" {
+    [ChatClient] as CC
+    [Advisors\n(Memory, QA/RAG, Logger)] as ADV
+    [ToolCallingManager] as TCM
+    [BeanOutputConverter] as BOC
+    [SimpleVectorStore] as VS
+    [ChatMemory] as MEM
+  }
+  [ChatModel\n(Mock rule-based)] as M
+  [EmbeddingModel\n(Mock hashing)] as E
+  [AkademikTools\n(@Tool)] as T
+}
+
+UI --> C : HTTP JSON
+C --> CS
+C --> RS
+C --> QS
+C --> DS
+CS --> CC
+RS --> CC
+QS --> CC
+CC --> ADV
+ADV --> MEM
+ADV --> VS
+CC --> M
+QS ..> BOC
+M --> TCM
+TCM --> T
+DS --> VS
+VS --> E
+@enduml

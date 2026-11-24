@@ -1,0 +1,36 @@
+@startuml sequence-chat-tool
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam sequenceParticipantBackgroundColor #E8EEFC
+skinparam sequenceParticipantBorderColor #2F5BD3
+autonumber
+actor Mahasiswa
+participant "Browser\n(index.html)" as UI
+participant AiController
+participant ChatService
+participant ChatClient
+participant "MessageChatMemoryAdvisor" as MEM
+participant "ChatModel" as Model
+participant "ToolCallingManager" as TCM
+participant AkademikTools
+
+Mahasiswa -> UI : ketik "Hitung IP saya: A 3 sks, B+ 2 sks, B 3 sks"
+UI -> AiController : POST /api/chat {conversationId, message}
+AiController -> ChatService : chat(id, message)
+ChatService -> ChatClient : prompt().user(msg).tools(tools).call()
+ChatClient -> MEM : before(request)
+MEM -> MEM : ambil riwayat dari ChatMemory
+MEM --> ChatClient : prompt + riwayat
+ChatClient -> Model : call(prompt)
+Model --> Model : jawaban berisi tool call hitungIp(nilai, sks)
+Model -> TCM : executeToolCalls(prompt, response)
+TCM -> AkademikTools : hitungIp("A,B+,B", "3,2,3")
+AkademikTools --> TCM : "IP = 3.45 dari total 8 SKS"
+TCM --> Model : ToolResponseMessage
+Model --> ChatClient : ChatResponse (jawaban akhir)
+ChatClient -> MEM : after(response) simpan ke ChatMemory
+ChatClient --> ChatService : ChatResponse
+ChatService --> AiController : ChatResponse DTO
+AiController --> UI : 200 OK (JSON)
+UI --> Mahasiswa : tampilkan jawaban
+@enduml

@@ -1,0 +1,121 @@
+@startuml class-diagram
+!pragma layout smetana
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #2F5BD3
+  HeaderBackgroundColor #E8EEFC
+}
+hide empty members
+
+package "controller" {
+  class AiController {
+    - chatService : ChatService
+    - ragService : RagService
+    - quizService : QuizService
+    - documentService : DocumentService
+    + chat(req : ChatRequest) : ChatResponse
+    + ask(req : AskRequest) : AskResponse
+    + upload(file : MultipartFile) : ResponseEntity
+    + quiz(req : QuizRequest) : Quiz
+    + info() : InfoResponse
+  }
+}
+
+package "service" {
+  class ChatService {
+    - chatClient : ChatClient
+    - tools : AkademikTools
+    + chat(conversationId : String, message : String) : ChatResponse
+  }
+  class RagService {
+    - ragClient : ChatClient
+    + ask(question : String) : AskResponse
+  }
+  class QuizService {
+    - chatClient : ChatClient
+    + generate(topic : String, jumlah : int) : Quiz
+  }
+  class DocumentService {
+    - vectorStore : VectorStore
+    - splitter : TokenTextSplitter
+    + loadDefaultDocuments() : void
+    + upload(fileName : String, content : byte[]) : UploadResponse
+  }
+}
+
+package "tools" {
+  class AkademikTools {
+    + <<@Tool>> waktuSekarang() : String
+    + <<@Tool>> hitungIp(nilai : String, sks : String) : String
+  }
+}
+
+package "config" {
+  class AiConfig {
+    + chatModel() : ChatModel
+    + embeddingModel() : EmbeddingModel
+    + chatMemory() : ChatMemory
+    + chatClient(...) : ChatClient
+    + vectorStore(...) : VectorStore
+  }
+}
+
+package "mock" {
+  class MockChatModel {
+    - toolCallingManager : ToolCallingManager
+    + call(prompt : Prompt) : ChatResponse
+    + getDefaultOptions() : ChatOptions
+  }
+  class MockEmbeddingModel {
+    + call(req : EmbeddingRequest) : EmbeddingResponse
+    + embed(doc : Document) : float[]
+  }
+}
+
+package "org.springframework.ai" <<Frame>> {
+  interface ChatModel
+  interface EmbeddingModel
+  interface ChatClient
+  interface VectorStore
+  interface ChatMemory
+  class SimpleVectorStore
+  class QuestionAnswerAdvisor
+  class MessageChatMemoryAdvisor
+}
+
+package "dto" {
+  class Quiz <<record>> {
+    topik : String
+    soal : List<Soal>
+  }
+  class Soal <<record>> {
+    pertanyaan : String
+    pilihan : List<String>
+    jawaban : String
+  }
+}
+
+AiController --> ChatService
+AiController --> RagService
+AiController --> QuizService
+AiController --> DocumentService
+ChatService --> ChatClient
+ChatService --> AkademikTools
+RagService --> QuestionAnswerAdvisor
+QuizService ..> Quiz : <<create>>
+Quiz *-- "1..*" Soal
+DocumentService --> VectorStore
+QuestionAnswerAdvisor --> VectorStore
+ChatClient --> ChatModel
+ChatClient o-- MessageChatMemoryAdvisor
+MessageChatMemoryAdvisor --> ChatMemory
+MockChatModel ..|> ChatModel
+MockEmbeddingModel ..|> EmbeddingModel
+SimpleVectorStore ..|> VectorStore
+SimpleVectorStore --> EmbeddingModel
+AiConfig ..> MockChatModel : <<create>>
+AiConfig ..> SimpleVectorStore : <<create>>
+@enduml

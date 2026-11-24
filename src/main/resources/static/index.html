@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiAkad AI - Asisten Akademik</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo">S</div>
+            <div>
+                <div class="brand-name">SiAkad AI</div>
+                <div class="brand-sub">Asisten Akademik · Spring AI</div>
+            </div>
+        </div>
+        <nav>
+            <button class="nav-item active" data-tab="chat"><span>💬</span> Chat Asisten</button>
+            <button class="nav-item" data-tab="rag"><span>📚</span> Tanya Dokumen</button>
+            <button class="nav-item" data-tab="quiz"><span>📝</span> Generator Kuis</button>
+            <button class="nav-item" data-tab="upload"><span>📤</span> Upload Dokumen</button>
+        </nav>
+        <div class="info-box">
+            <div class="info-row"><span>Model</span><b id="info-model">-</b></div>
+            <div class="info-row"><span>Chunk di VectorStore</span><b id="info-chunk">-</b></div>
+            <div class="info-row"><span>Dokumen</span><b id="info-doc">-</b></div>
+        </div>
+    </aside>
+
+    <main>
+        <!-- CHAT -->
+        <section class="panel active" id="tab-chat">
+            <header class="panel-head">
+                <h1>Chat Asisten</h1>
+                <p>Chat dengan memori percakapan (ChatMemory) dan tool calling (waktu & hitung IP).</p>
+            </header>
+            <div class="chat-box" id="chat-box">
+                <div class="msg bot">Halo! Saya <b>SiAkad AI</b>. Coba tanya tentang Spring AI, RAG, UML, minta hitung IP, atau tanya tanggal hari ini.</div>
+            </div>
+            <div class="chips">
+                <button class="chip">Apa itu Spring AI?</button>
+                <button class="chip">Halo, nama saya Syauqi</button>
+                <button class="chip">Siapa nama saya?</button>
+                <button class="chip">Hari ini tanggal berapa?</button>
+                <button class="chip">Hitung IP saya: A 3 sks, B+ 2 sks, B 3 sks</button>
+            </div>
+            <form class="input-row" id="chat-form">
+                <input id="chat-input" placeholder="Ketik pesan..." autocomplete="off">
+                <button type="submit" class="btn">Kirim</button>
+            </form>
+        </section>
+
+        <!-- RAG -->
+        <section class="panel" id="tab-rag">
+            <header class="panel-head">
+                <h1>Tanya Dokumen (RAG)</h1>
+                <p>Pertanyaan dijawab berdasarkan isi dokumen panduan akademik melalui QuestionAnswerAdvisor + VectorStore.</p>
+            </header>
+            <form class="input-row" id="rag-form">
+                <input id="rag-input" placeholder="Contoh: Berapa minimal kehadiran agar bisa ikut UAS?" autocomplete="off">
+                <button type="submit" class="btn">Tanya</button>
+            </form>
+            <div class="chips">
+                <button class="chip rag-chip">Berapa minimal kehadiran agar bisa ikut UAS?</button>
+                <button class="chip rag-chip">Apa syarat mengambil skripsi?</button>
+                <button class="chip rag-chip">Berapa maksimal SKS jika IP di atas 3,00?</button>
+                <button class="chip rag-chip">Kapan laboratorium komputer buka?</button>
+            </div>
+            <div id="rag-result"></div>
+        </section>
+
+        <!-- QUIZ -->
+        <section class="panel" id="tab-quiz">
+            <header class="panel-head">
+                <h1>Generator Kuis</h1>
+                <p>Structured Output: jawaban model dikonversi otomatis menjadi objek Java <code>Quiz</code>.</p>
+            </header>
+            <form class="input-row" id="quiz-form">
+                <input id="quiz-topic" placeholder="Topik, misal: Spring AI, UML, OOP, Java, Basis Data" value="Spring AI">
+                <select id="quiz-n">
+                    <option>3</option><option selected>4</option><option>5</option>
+                </select>
+                <button type="submit" class="btn">Buat Kuis</button>
+            </form>
+            <div id="quiz-result"></div>
+        </section>
+
+        <!-- UPLOAD -->
+        <section class="panel" id="tab-upload">
+            <header class="panel-head">
+                <h1>Upload Dokumen</h1>
+                <p>Tambahkan dokumen (.txt / .md) ke VectorStore: TextReader → TokenTextSplitter → Embedding → VectorStore.</p>
+            </header>
+            <form id="upload-form" class="upload-zone">
+                <div class="upload-icon">📄</div>
+                <input type="file" id="upload-file" accept=".txt,.md">
+                <button type="submit" class="btn">Upload &amp; Index</button>
+            </form>
+            <div id="upload-result"></div>
+        </section>
+    </main>
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>
